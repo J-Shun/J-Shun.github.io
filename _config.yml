@@ -103,4 +103,4 @@ theme: landscape
 deploy:
   type: git
   repo: https://github.com/J-Shun/J-Shun.github.io
-  branch: main
+  branch: gh-pages

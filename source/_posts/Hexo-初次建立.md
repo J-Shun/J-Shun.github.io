@@ -60,3 +60,8 @@ deploy:
 - 使用指令：`hexo clean && hexo deploy`
 
 部署完後即可在 `https://<username>.github.io/` 確認部屬的靜態網站
+
+## 參考資料
+
+[【學習筆記】如何使用 Hexo + GitHub Pages 架設個人網誌](https://hackmd.io/@Heidi-Liu/note-hexo-github)
+[Hexo GitHub Pages](https://hexo.io/docs/github-pages)

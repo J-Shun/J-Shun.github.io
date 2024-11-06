@@ -49,7 +49,7 @@ docker-compose 這個 yml 檔的所在位置會成為 Dockerfile 中路徑的基
 
 使用指令：`docker build -t { image name } .`
 
-- 「.」不可省略，表示把當前目錄下的檔案及資料夾作為 Dockerfile 配置文件的上下文。專案是在本地環境而不是 Docker，所以透過「.」將當前專案送到 Docker 的環境
+- 「.」不可省略，代表告訴 Docker 在當前檔案位置找尋 Dockerfile 來構建 image
 - -t 表示 tag，也就是將鏡像賦予標籤
 
 ## 創建容器（container）
@@ -101,6 +101,101 @@ docker run --name nginxContainer -p 8080:80 -v $(pwd)/index.html:/usr/share/ngin
 - 停止：`docker stop { container id or name }` 
 - 刪除：`docker rm { container id or name }`
 
+## 範例：容器化專案
+
+### 建立相關專案
+
+使用 vite 創建測試專案，並進入專案資料夾
+
+透過 `npm i` 下載依賴，將測試專案準備好
+
+### 撰寫 Dockerfile
+
+創建 Dockerfile，並在裡面寫入下列指令
+
+```dockerfile
+
+# 指定 node 版本並指定這階段名稱為 build-stage
+# lts 代表「長期支援版」（Long-Term Support, LTS）
+FROM node:lts-alpine as build-stage
+
+# 設定工作目錄 /app，Docker 會自動創造
+# 接下來的指令皆會在此目錄下執行
+WORKDIR /app
+
+# 複製 package.json 和 package-lock.json 到當前目錄 (/app)
+COPY package*.json ./
+
+# 在容器中執行 npm 安裝，確保容器內有相關依賴
+RUN npm install
+
+# 複製當前所有檔案到容器中
+# 第一個「.」代表 Dockerfile 所在的本地構建的根目錄
+# 第二個「.」代表容器中的當前工作目錄（/app）
+COPY . .
+
+# 打包程式碼
+RUN npm run build
+
+# 指定 nginx 版本並命名為 production-stage
+# stable-alpine 為 nginx 的穩定版本，基於 alpine Linux，適合用於生產環境
+FROM nginx:stable-alpine as production-stage
+
+# 複製打包結果到 nginx 中
+# --from=build-stage 表示從之前的 build-stage 階段中提取文件。
+# /usr/share/nginx/html 是 nginx 的預設靜態文件服務目錄
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+# 指定容器對外開放的接口
+EXPOSE 80
+
+# 設置了容器啟動時運行的命令，這裡讓 nginx 以前台模式啟動並保持運行
+# 指定容器啟動時要的默認命令，該指令在構建過程中不會執行
+CMD ["nginx", "-g", "daemon off;"]
+
+```
+
+### 建立 image
+
+使用指令：`docker build -t { image name } .`
+
+範例：
+```bash
+docker build -t vite-image .
+```
+
+### 創建 container
+
+使用指令 `docker run -dp 80:80 --name { name } { image name }`
+
+範例：
+```bash
+docker run -dp 8000:80 --name vite-container vite-image
+```
+
+此時可以去 `localhost:8000` 確認是否有成功連上測試專案
+
+### 結束 container 並刪除
+
+關閉後 container 會需要自行**關閉**及**移除**，否則會佔用接口
+
+需要先將 container 關閉後才可刪除
+
+使用指令：
+- `docker stop { container name }` 關閉
+- `docker rm { container name }` 刪除
+
+範例：
+```bash
+docker stop vite-container
+docker rm vite-container
+```
+
+此時舊 container 才不會佔用接口
+
+如果想停止所有容器，可以使用指令：`docker container prune`
+
+另外刪除 container 後，還應該考慮刪除不再需要的 image 好釋放磁碟空間
 
 ## 小結
 
@@ -115,3 +210,4 @@ docker run --name nginxContainer -p 8080:80 -v $(pwd)/index.html:/usr/share/ngin
 ## 參考資料
 
 - [Docker 建立 Nginx 基礎分享](https://medium.com/@xroms123/docker-%E5%BB%BA%E7%AB%8B-nginx-%E5%9F%BA%E7%A4%8E%E5%88%86%E4%BA%AB-68c0771457fb)
+- [初探 Docker：認識 Docker 以及了解如何建立前端專案 Dockerfile](https://rurutseng.com/posts/docker/)

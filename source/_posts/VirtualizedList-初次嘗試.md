@@ -6,7 +6,7 @@ tags:
 
 ## 重點
 
-Virtualize List 可針對過於龐大的 List 資料所進行的渲染處理
+Virtualize List 可針對過於龐大的 List 進行渲染上的處理
 
 ## 說明
 

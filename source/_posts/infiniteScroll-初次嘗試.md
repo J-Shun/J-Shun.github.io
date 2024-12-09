@@ -53,7 +53,7 @@ infinite scroll 是讓頁面能夠無限載入新內容的技術，常見於社�
 
 **事件監聽**
 
-```jsx
+```tsx
 import './App.css';
 import { useEffect, useState, useRef } from 'react';
 
@@ -61,7 +61,7 @@ const item = Array.from({ length: 10 }, (_, index) => index + 1);
 
 // 事件監聽
 function App() {
-  const containerRef = useRef() as React.MutableRefObject<HTMLDivElement>;
+  const containerRef = useRef() as ReactMutableRefObject<HTMLDivElement>;
 
   const [data, setData] = useState(item);
   const [position, setPosition] = useState(1); // 通常會與 API 做搭配，用來記錄載入資料位置

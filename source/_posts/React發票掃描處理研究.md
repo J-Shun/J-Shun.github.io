@@ -482,6 +482,8 @@ export default function ScanRegister({ setPageLoading }) {
 
 不過關鍵的靈敏度不減，是否需要這層處理就看狀況了
 
+## 相關參考資料
+
 [Demo](https://yudielcurbelo.github.io/react-qr-scanner/?path=/story/scanner--scanner)
 [參考範例](https://dev.classmethod.jp/articles/customizing-scan-ui-with-iscannercomponents-in-yudiel-react-qr-scanner/)
 [參考用法](https://github.com/yudielcurbelo/react-qr-scanner/blob/main/stories/Scanner.stories.tsx)
